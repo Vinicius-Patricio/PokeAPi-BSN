@@ -1,14 +1,36 @@
 <ion-content>
-  <ion-list>
-    <ion-item *ngFor="let pokemon of pokemons" [routerLink]="['/pokemon', extractId(pokemon.url)]">
-      <ion-avatar slot="start">
-        <img [src]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + extractId(pokemon.url) + '.png'" />
-      </ion-avatar>
-      <ion-label>{{ pokemon.name | uppercase }}</ion-label>
-    </ion-item>
-  </ion-list>
+  <div class="pokemon-grid">
+    <ion-card *ngFor="let pokemon of pokemons" [routerLink]="['/pokemon', extractId(pokemon.url)]">
+      <ion-card-content>
+        <div class="pokemon-item">
+          <img class="pokemon-image" 
+               [src]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/' + extractId(pokemon.url) + '.png'"
+               alt="{{ pokemon.name }}"
+               (error)="handleImageError($event)" />
+          <div class="pokemon-info">
+            <span class="pokemon-number">#{{ extractId(pokemon.url) | number:'3.0' }}</span>
+            <h2 class="pokemon-name">{{ pokemon.name | uppercase }}</h2>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
 
-  <ion-infinite-scroll (ionInfinite)="onInfiniteScroll($event)">
-    <ion-infinite-scroll-content loadingText="Carregando mais pokémons..."></ion-infinite-scroll-content>
-  </ion-infinite-scroll>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="prevPage()" [disabled]="currentPage === 1">
+        Anterior
+      </ion-button>
+    </ion-buttons>
+
+    <span style="margin: 0 10px;">
+      Página {{ currentPage }} de {{ totalPages }}
+    </span>
+
+    <ion-buttons slot="end">
+      <ion-button (click)="nextPage()" [disabled]="currentPage === totalPages">
+        Próxima
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
 </ion-content>

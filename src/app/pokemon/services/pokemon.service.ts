@@ -1,16 +1,23 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, shareReplay } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class PokemonService {
     private readonly http = inject(HttpClient);
     private readonly apiUrl = 'https://pokeapi.co/api/v2';
+    private cache = new Map<string, Observable<any>>();
 
-    getPokemons(limit: number = 20, offset: number = 0): Observable<PokemonListResponse> {
-        return this.http.get<PokemonListResponse>(
-            `${this.apiUrl}/pokemon?limit=${limit}&offset=${offset}`
-        );
+    getPokemons(limit: number, offset: number): Observable<PokemonListResponse> {
+        const key = `pokemons-${limit}-${offset}`;
+
+        if (!this.cache.has(key)) {
+            this.cache.set(key, this.http.get<PokemonListResponse>(
+                `${this.apiUrl}/pokemon?limit=${limit}&offset=${offset}`
+            ).pipe(shareReplay(1)));
+        }
+
+        return this.cache.get(key)!;
     }
 
     getPokemonDetails(id: string): Observable<PokemonDetails> {
