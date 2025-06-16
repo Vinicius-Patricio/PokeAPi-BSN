@@ -1,0 +1,14 @@
+<ion-content>
+  <ion-list>
+    <ion-item *ngFor="let pokemon of pokemons" [routerLink]="['/pokemon', extractId(pokemon.url)]">
+      <ion-avatar slot="start">
+        <img [src]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + extractId(pokemon.url) + '.png'" />
+      </ion-avatar>
+      <ion-label>{{ pokemon.name | uppercase }}</ion-label>
+    </ion-item>
+  </ion-list>
+
+  <ion-infinite-scroll (ionInfinite)="onInfiniteScroll($event)">
+    <ion-infinite-scroll-content loadingText="Carregando mais pokémons..."></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+</ion-content>
