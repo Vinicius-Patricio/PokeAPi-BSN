@@ -1,0 +1,7 @@
+{
+  "name": "PokeAPi-BSN-ViniciusPatricio",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
