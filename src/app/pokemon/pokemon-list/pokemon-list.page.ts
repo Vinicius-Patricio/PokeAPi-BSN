@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule, UpperCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { 
   IonContent, 
   IonList, 
@@ -15,6 +15,7 @@ import {
 } from '@ionic/angular/standalone';
 import { PokemonService } from '../services/pokemon.service';
 import { PokemonBasicInfo } from '../interfaces/pokemon.interface';
+import { TranslateTypePipe } from '../pipes/translate-type.pipe';
 
 @Component({
   selector: 'app-pokemon-list',
@@ -34,21 +35,31 @@ import { PokemonBasicInfo } from '../interfaces/pokemon.interface';
     IonLabel,
     IonButton,
     IonButtons,
-    IonToolbar
+    IonToolbar,
+    TranslateTypePipe
   ]
 })
 export class PokemonListPage implements OnInit {
   private pokemonService = inject(PokemonService);
+  
   pokemons: PokemonBasicInfo[] = [];
   loading = false;
   currentPage = 1;
   offset = 0;
-  pageSize = 20;
+  pageSize = 24;
   hasMore= true;
   totalPokemons = 0;
   totalPages = 0;
 
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router
+  ) {}
+
   ngOnInit(): void {
+    const savedPage = +(this.route.snapshot.queryParamMap.get('page') || localStorage.getItem('currentPokemonPage') || 1);
+    
+    this.currentPage = savedPage;
     this.loadPokemons();
   }
 
@@ -61,7 +72,18 @@ export class PokemonListPage implements OnInit {
     this.pokemonService.getPokemons(this.pageSize, offset)
     .subscribe({
       next: (response) => {
-        this.pokemons = response.results;
+        this.pokemons = response.results.map(pokemon => ({...pokemon,
+          id: this.extractId(pokemon.url),
+          types: []
+        }));
+        
+        this.pokemons.forEach(pokemon => {
+          this.pokemonService.getPokemonDetails(pokemon.id).subscribe(details => {
+            pokemon.types = details.types.map(t => t.type.name.toLowerCase());
+            console.log(pokemon.name, pokemon.types);
+          });
+        });
+
         this.totalPokemons = response.count;
         this.totalPages = Math.ceil(this.totalPokemons / this.pageSize);
         this.loading = false;
@@ -72,18 +94,36 @@ export class PokemonListPage implements OnInit {
       }
     });
   }
+  
+  loadPage(page: number) {
+    this.currentPage = page;
+    localStorage.setItem('currentPokemonPage', page.toString());
+    
+    this.router.navigate([], {
+      queryParams: { page },
+      queryParamsHandling: 'merge'
+    });
+    
+    this.loadPokemons();
+  }
 
-  nextPage(): void {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.loadPokemons();
+  changePage(direction: 'next' | 'prev' ): void {
+    const newPage = direction === 'next' ? this.currentPage + 1 : this.currentPage - 1;
+    
+    if (newPage >= 1 && newPage <= this.totalPages) {
+      this.loadPage(newPage);
     }
   }
 
-  prevPage(): void {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.loadPokemons();
+  goToFirstPage(): void {
+    if (this.currentPage !== 1) {
+      this.loadPage(1);
+    }
+  }
+  
+  goToLastPage(): void {
+    if (this.currentPage !== this.totalPages) {
+      this.loadPage(this.totalPages);
     }
   }
 

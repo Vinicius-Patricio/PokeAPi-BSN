@@ -35,6 +35,8 @@ export interface PokemonListResponse {
 export interface PokemonBasicInfo {
     name: string;
     url: string;
+    id: string;
+    types: string[];
 }
 
 export interface PokemonDetails {

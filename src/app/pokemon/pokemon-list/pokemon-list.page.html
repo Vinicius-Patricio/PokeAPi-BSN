@@ -1,36 +1,71 @@
 <ion-content>
-  <div class="pokemon-grid">
-    <ion-card *ngFor="let pokemon of pokemons" [routerLink]="['/pokemon', extractId(pokemon.url)]">
-      <ion-card-content>
-        <div class="pokemon-item">
-          <img class="pokemon-image" 
-               [src]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/' + extractId(pokemon.url) + '.png'"
-               alt="{{ pokemon.name }}"
-               (error)="handleImageError($event)" />
-          <div class="pokemon-info">
-            <span class="pokemon-number">#{{ extractId(pokemon.url) | number:'3.0' }}</span>
-            <h2 class="pokemon-name">{{ pokemon.name | uppercase }}</h2>
-          </div>
-        </div>
-      </ion-card-content>
-    </ion-card>
+  <div class="header-image">
+    <img src="assets/images/logo-pokemon.png" alt="Pokémon Logo" class="logo">
   </div>
 
+  <div class="main-container">
+    <div class="pokemon-grid ">
+      <ion-card *ngFor="let pokemon of pokemons" [routerLink]="['/pokemon', extractId(pokemon.url)]">
+        <ion-card-content>
+          <div class="pokemon-item">
+            <img class="pokemon-image"
+                [src]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/' + extractId(pokemon.url) + '.png'"
+                alt="{{ pokemon.name }}"
+                (error)="handleImageError($event)" />
+            <div class="pokemon-info">
+              <span class="pokemon-number">#{{ extractId(pokemon.url) | number:'3.0' }}</span>
+              <h2 class="pokemon-name">{{ pokemon.name | uppercase }}</h2>
+              <div class="flex gap-1 mt-1 justify-center">
+                <span *ngFor="let type of pokemon.types"
+                      class="px-2 py-1 rounded-full text-xs capitalize pokemon-type-badge"
+                      [ngClass]="{
+                        'bg-red-500 text-white': type === 'fire',
+                        'bg-blue-500 text-white': type === 'water',
+                        'bg-blue-300 text-white': type === 'ice',
+                        'bg-green-500 text-white': type === 'grass',
+                        'bg-green-400 text-white': type === 'bug',
+                        'bg-yellow-400 text-black': type === 'electric',
+                        'bg-purple-500 text-white': type === 'poison',
+                        'bg-purple-700 text-white': type === 'ghost',
+                        'bg-gray-400 text-white': type === 'normal',
+                        'bg-gray-600 text-white': type === 'steel',
+                        'bg-amber-600 text-white': type === 'rock',
+                        'bg-amber-800 text-white': type === 'ground',
+                        'bg-pink-400 text-white': type === 'fairy',
+                        'bg-indigo-500 text-white': type === 'psychic',
+                        'bg-indigo-800 text-white': type === 'dragon',
+                        'bg-cyan-400 text-white': type === 'flying',
+                        'bg-gray-800 text-white': type === 'dark',
+                        'bg-rose-400 text-white': type === 'fighting'
+                      }">
+                      {{type | translateType }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
   <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-button (click)="prevPage()" [disabled]="currentPage === 1">
-        Anterior
+    <div class="flex ml-8 items-center gap-2 w-full">
+      <ion-button size="small" (click)="goToFirstPage()" [disabled]="currentPage === 1" >
+        Primeira
       </ion-button>
-    </ion-buttons>
-
-    <span style="margin: 0 10px;">
-      Página {{ currentPage }} de {{ totalPages }}
-    </span>
-
-    <ion-buttons slot="end">
-      <ion-button (click)="nextPage()" [disabled]="currentPage === totalPages">
-        Próxima
+      <ion-button size="small" (click)="changePage('prev')" [disabled]="currentPage === 1">
+        &lt;
       </ion-button>
-    </ion-buttons>
+      
+      <span class="text-sm">
+        Pág. {{ currentPage }}/{{ totalPages }}
+      </span>
+      
+      <ion-button size="small" (click)="changePage('next')" [disabled]="currentPage === totalPages">
+        &gt;
+      </ion-button>
+      <ion-button size="small" (click)="goToLastPage()" [disabled]="currentPage === totalPages" >
+        Última
+      </ion-button>
+    </div>
   </ion-toolbar>
 </ion-content>

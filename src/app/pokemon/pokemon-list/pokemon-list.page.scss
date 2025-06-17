@@ -1,9 +1,15 @@
+.main-container {
+    max-width: 1350px;
+    margin: 0 auto;
+    padding: 0 16px;
+    margin-bottom: 2%;
+}
+
 .pokemon-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
     gap: 16px;
-    padding: 16px;
-    padding-bottom: 80px;
+    width: 100%;
 }
 
 
@@ -53,13 +59,20 @@ ion-card {
     }
 }
 
+.pokemon-type-badge {
+    color: white !important;
+    
+    &.text-black {
+    color: black !important;
+    }
+}
+
 .pagination-toolbar {
     --background: var(--ion-color-light);
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
 
     .page-counter {
         font-size: 0.9rem;
