@@ -23,6 +23,22 @@ ion-card {
     &:hover {
         transform: translateY(-5px);
     }
+    
+    .id-search {
+        ion-searchbar {
+            --background: #f5f5f5;
+            --border-radius: 8px;
+
+            input[type="number"] {
+                -moz-appearance: textfield;
+                &::-webkit-outer-spin-button,
+                &::-webkit-inner-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
+                }
+            }
+        }
+    }
 }
 
 .pokemon-item {
@@ -59,11 +75,127 @@ ion-card {
     }
 }
 
+.filters-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 16px;
+}
+
+.search-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 12px;
+
+    @media (min-width: 768px) {
+    flex-direction: row;
+
+    ion-searchbar {
+        flex: 1;
+    }
+    }
+}
+
+.filters-row {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    @media (min-width: 768px) {
+    flex-direction: row;
+    align-items: center;
+    }
+}
+
+.type-filter {
+    width: 100%;
+    
+    @media (min-width: 768px) {
+    width: auto;
+    min-width: 200px;
+    }
+}
+
+.generation-filter {
+    width: 100%;
+    
+    @media (min-width: 768px) {
+    width: auto;
+    min-width: 200px;
+    }
+}
+
+ion-searchbar {
+    --background: #f5f5f5;
+    --border-radius: 8px;
+    --box-shadow: none;
+    --placeholder-color: #666;
+    --placeholder-opacity: 0.8;
+}
+
+@media (max-width: 767px) {
+    ion-searchbar {
+    --min-height: 48px;
+    font-size: 14px;
+    }
+    
+    .id-search {
+    ion-input {
+        font-size: 14px;
+    }
+    }
+}
+
+ion-searchbar {
+    padding: 0;
+    --background: var(--ion-color-light);
+    --border-radius: 8px;
+    margin-bottom: 12px;
+}
+
+ion-item {
+    --inner-padding-end: 0;
+    --background: var(--ion-color-light);
+    border-radius: 8px;
+}
+
+ion-select {
+    width: 100%;
+}
+
 .pokemon-type-badge {
     color: white !important;
     
     &.text-black {
     color: black !important;
+    }
+}
+
+.results-info {
+    text-align: center;
+    padding: 8px 16px;
+    margin: 0 auto;
+    max-width: 1200px;
+    
+    p {
+        margin: 0;
+        color: var(--ion-color-medium);
+        font-size: 0.9rem;
+    }
+}
+
+.no-results {
+    text-align: center;
+    padding: 40px 16px;
+    margin: 0 auto;
+    max-width: 1200px;
+    
+    p {
+        margin: 0;
+        color: var(--ion-color-medium);
+        font-size: 1.1rem;
+        font-style: italic;
     }
 }
 

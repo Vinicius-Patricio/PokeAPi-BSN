@@ -9,7 +9,8 @@ export interface PokemonBasicInfo {
     name: string;
     url: string;
     id: string;
-    types: string [];
+    types: string[];
+    generation?: string;
 }
 
 export interface PokemonDetails {

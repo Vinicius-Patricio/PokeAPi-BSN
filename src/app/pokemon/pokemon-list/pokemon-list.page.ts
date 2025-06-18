@@ -2,20 +2,24 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule, UpperCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { 
-  IonContent, 
-  IonList, 
-  IonItem, 
-  IonAvatar, 
+import {
+  IonContent,
+  IonList,
+  IonItem,
+  IonAvatar,
   IonLabel,
   IonButton,
   IonButtons,
   IonToolbar,
-  IonCardContent
+  IonCardContent,
+  IonSearchbar,
+  IonSelect,
+  IonSelectOption
 } from '@ionic/angular/standalone';
 import { PokemonService } from '../services/pokemon.service';
 import { PokemonBasicInfo } from '../interfaces/pokemon.interface';
 import { TranslateTypePipe } from '../pipes/translate-type.pipe';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-pokemon-list',
@@ -36,7 +40,10 @@ import { TranslateTypePipe } from '../pipes/translate-type.pipe';
     IonButton,
     IonButtons,
     IonToolbar,
-    TranslateTypePipe
+    TranslateTypePipe,
+    IonSearchbar,
+    IonSelect,
+    IonSelectOption
   ]
 })
 export class PokemonListPage implements OnInit {
@@ -45,11 +52,35 @@ export class PokemonListPage implements OnInit {
   pokemons: PokemonBasicInfo[] = [];
   loading = false;
   currentPage = 1;
-  offset = 0;
   pageSize = 24;
-  hasMore= true;
   totalPokemons = 0;
   totalPages = 0;
+  searchTerm = '';
+  selectedType = '';
+  selectedGeneration = '';
+  availableTypes: string[] = [
+    'normal', 'fire', 'water', 'electric', 'grass',
+    'ice', 'fighting', 'poison', 'ground', 'flying',
+    'psychic', 'bug', 'rock', 'ghost', 'dragon',
+    'dark', 'steel', 'fairy'
+  ];
+  availableGenerations: { value: string; label: string }[] = [
+    { value: '', label: 'Todas' },
+    { value: '1', label: 'Geração 1 (Kanto)' },
+    { value: '2', label: 'Geração 2 (Johto)' },
+    { value: '3', label: 'Geração 3 (Hoenn)' },
+    { value: '4', label: 'Geração 4 (Sinnoh)' },
+    { value: '5', label: 'Geração 5 (Unova)' },
+    { value: '6', label: 'Geração 6 (Kalos)' },
+    { value: '7', label: 'Geração 7 (Alola)' },
+    { value: '8', label: 'Geração 8 (Galar)' },
+    { value: '9', label: 'Geração 9 (Paldea)' },
+    { value: '10', label: 'Geração 10' }
+  ];
+  filteredPokemons: PokemonBasicInfo[] = [];
+  allPokemons: PokemonBasicInfo[] = [];
+  searchId = '';
+  totalLoadedPokemons = 0;
 
   constructor(
     private route: ActivatedRoute,
@@ -60,33 +91,32 @@ export class PokemonListPage implements OnInit {
     const savedPage = +(this.route.snapshot.queryParamMap.get('page') || localStorage.getItem('currentPokemonPage') || 1);
     
     this.currentPage = savedPage;
-    this.loadPokemons();
+    this.loadAllPokemons();
   }
 
-  loadPokemons(): void {
+  loadAllPokemons(): void {
     if (this.loading) return;
       
     this.loading = true;
-    const offset = (this.currentPage - 1) * this.pageSize;
 
-    this.pokemonService.getPokemons(this.pageSize, offset)
+    this.pokemonService.getAllPokemons()
     .subscribe({
-      next: (response) => {
-        this.pokemons = response.results.map(pokemon => ({...pokemon,
-          id: this.extractId(pokemon.url),
-          types: []
-        }));
+      next: (pokemons) => {
+        this.allPokemons = pokemons;
+        this.totalLoadedPokemons = pokemons.length;
         
-        this.pokemons.forEach(pokemon => {
-          this.pokemonService.getPokemonDetails(pokemon.id).subscribe(details => {
-            pokemon.types = details.types.map(t => t.type.name.toLowerCase());
-            console.log(pokemon.name, pokemon.types);
+        const detailObservables = this.allPokemons.map(pokemon => 
+          this.pokemonService.getPokemonDetails(pokemon.id)
+        );
+        
+        forkJoin(detailObservables).subscribe(details => {
+          details.forEach((detail, index) => {
+            this.allPokemons[index].types = detail.types.map(t => t.type.name.toLowerCase());
           });
+          
+          this.applyFilters();
+          this.loading = false;
         });
-
-        this.totalPokemons = response.count;
-        this.totalPages = Math.ceil(this.totalPokemons / this.pageSize);
-        this.loading = false;
       },
       error: (err) => {
         console.error('Erro ao carregar pokémons:', err);
@@ -94,7 +124,39 @@ export class PokemonListPage implements OnInit {
       }
     });
   }
-  
+
+  applyFilters() {
+    if (!this.allPokemons) return;
+
+    this.filteredPokemons = this.allPokemons.filter(pokemon => {
+      const id = pokemon.id.toString();
+      
+      return (
+        (!this.searchTerm || pokemon.name.toLowerCase().includes(this.searchTerm.toLowerCase())) &&
+        (!this.searchId || id.includes(this.searchId)) &&
+        (!this.selectedType || pokemon.types.includes(this.selectedType.toLowerCase())) &&
+        (!this.selectedGeneration || pokemon.generation === this.selectedGeneration)
+      );
+    });
+
+    this.applyPagination();
+  }
+
+  applyPagination() {
+    this.totalPokemons = this.filteredPokemons.length;
+    this.totalPages = Math.ceil(this.totalPokemons / this.pageSize);
+
+    if (this.currentPage > this.totalPages && this.totalPages > 0) {
+      this.currentPage = this.totalPages;
+    } else if (this.totalPages === 0) {
+      this.currentPage = 1;
+    }
+    
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    this.pokemons = this.filteredPokemons.slice(startIndex, endIndex);
+  }
+
   loadPage(page: number) {
     this.currentPage = page;
     localStorage.setItem('currentPokemonPage', page.toString());
@@ -104,7 +166,7 @@ export class PokemonListPage implements OnInit {
       queryParamsHandling: 'merge'
     });
     
-    this.loadPokemons();
+    this.applyPagination();
   }
 
   changePage(direction: 'next' | 'prev' ): void {
@@ -135,5 +197,29 @@ export class PokemonListPage implements OnInit {
   handleImageError(event: Event) {
     const imgElement = event.target as HTMLImageElement;
     imgElement.src = '';
+  }
+
+  handleNumberInput(event: any) {
+    const input = event.target;
+    let value = input.value;
+    
+    const cleanValue = value.replace(/[^0-9]/g, '');
+  
+    if (cleanValue !== value) {
+      input.value = cleanValue;
+      this.searchId = cleanValue;
+      input.dispatchEvent(new Event('input'));
+    }
+    this.applyFilters();
+  }
+
+  onNumberKeyPress(event: KeyboardEvent) {
+    const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
+    const isNumber = /[0-9]/.test(event.key);
+    const isAllowedKey = allowedKeys.includes(event.key);
+    
+    if (!isNumber && !isAllowedKey) {
+      event.preventDefault();
+    }
   }
 }
