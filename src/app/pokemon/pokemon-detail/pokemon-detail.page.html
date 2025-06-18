@@ -1,0 +1,159 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()" fill="clear" size="small">
+        <ion-icon name="arrow-back"></ion-icon>
+        Lista
+      </ion-button>
+    </ion-buttons>
+    <ion-title *ngIf="pokemon">{{ pokemon.name | uppercase }}</ion-title>
+    <ion-title *ngIf="!pokemon && !loading">Pokémon não encontrado</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div *ngIf="loading" class="flex flex-col items-center justify-center h-screen text-center p-5">
+    <ion-spinner name="crescent" class="mb-4"></ion-spinner>
+    <p class="text-gray-500 mb-4">Carregando detalhes do Pokémon...</p>
+  </div>
+
+  <div *ngIf="error" class="flex flex-col items-center justify-center h-screen text-center p-5">
+    <ion-icon name="alert-circle-outline" size="large" class="mb-2"></ion-icon>
+    <h2 class="mb-2 text-gray-900">Erro ao carregar Pokémon</h2>
+    <p class="text-gray-500 mb-4">Não foi possível carregar os detalhes deste Pokémon.</p>
+    <ion-button (click)="goBack()">Voltar</ion-button>
+  </div>
+
+  <div *ngIf="pokemon && !loading" class="pokemon-detail-container">
+    <div class="pokemon-header" [style.background]="getBackgroundStyle()">
+      <div class="pokemon-image-container">
+        <img [src]="getPokemonImageUrl(pokemon.id)" [alt]="pokemon.name" (error)="handleImageError($event)" class="pokemon-image">
+      </div>
+      <div class="pokemon-info">
+        <h1 class="pokemon-name">{{ pokemon.name | uppercase }}</h1>
+        <p class="pokemon-number">#{{ pokemon.id | number:'3.0' }}</p>
+        <div class="pokemon-types">
+          <ion-chip *ngFor="let type of pokemon.types" [ngClass]="'type-' + type.type.name.toLowerCase()">
+            {{ type.type.name | translateType }}
+          </ion-chip>
+        </div>
+      </div>
+    </div>
+
+    <ion-card class="info-card">
+      <ion-card-header>
+        <ion-card-title>Informações Básicas</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="6">
+              <ion-item>
+                <ion-label>
+                  <h3>Altura</h3>
+                  <p>{{ pokemon.height / 10 }} m</p>
+                </ion-label>
+              </ion-item>
+            </ion-col>
+            <ion-col size="6">
+              <ion-item>
+                <ion-label>
+                  <h3>Peso</h3>
+                  <p>{{ pokemon.weight / 10 }} kg</p>
+                </ion-label>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col size="6">
+              <ion-item>
+                <ion-label>
+                  <h3>Geração</h3>
+                  <p>{{ getGenerationName(pokemon.generation || '1') }}</p>
+                </ion-label>
+              </ion-item>
+            </ion-col>
+            <ion-col size="6">
+              <ion-item>
+                <ion-label>
+                  <h3>Experiência Base</h3>
+                  <p>{{ pokemon.base_experience }}</p>
+                </ion-label>
+              </ion-item>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="sprites-card">
+      <ion-card-header>
+        <ion-card-title>Sprites</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="6" *ngIf="pokemon.sprites.front_default">
+              <div class="sprite-container">
+                <h4>Padrão</h4>
+                <img [src]="pokemon.sprites.front_default" [alt]="pokemon.name + ' frontal'">
+              </div>
+            </ion-col>
+            <ion-col size="6" *ngIf="pokemon.sprites.front_shiny">
+              <div class="sprite-container">
+                <h4>Versão Shiny</h4>
+                <img [src]="pokemon.sprites.front_shiny" [alt]="pokemon.name + ' frontal shiny'">
+              </div>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card *ngIf="pokemon?.cries?.latest">
+      <ion-card-header>
+        <ion-card-title>Choro do Pokémon</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <audio [src]="pokemon.cries.latest" controls>
+          Seu navegador não suporta o elemento de áudio.
+        </audio>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="evolution-card" *ngIf="evolutions.length > 1">
+      <ion-card-header>
+        <ion-card-title>Linha Evolutiva</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="evolution-chain">
+          <div *ngFor="let evolution of evolutions; let i = index" class="evolution-item" [ngClass]="{ 'current': evolution.isCurrent }">
+            <div class="evolution-pokemon" (click)="goToPokemon(+evolution.id)">
+              <img [src]="getPokemonImageUrl(evolution.id)" [alt]="evolution.name" (error)="handleImageError($event)" class="evolution-image">
+              <p class="evolution-name">{{ evolution.name | uppercase }}</p>
+              <p class="evolution-number">#{{ evolution.id | number:'3.0' }}</p>
+            </div>
+            <div class="evolution-arrow" *ngIf="i < evolutions.length - 1">
+              <ion-icon name="arrow-forward"></ion-icon>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card class="navigation-card">
+      <ion-card-content>
+        <div class="navigation-buttons">
+          <ion-button *ngIf="previousPokemon" (click)="goToPrevious()" fill="outline" class="nav-button">
+            <ion-icon name="chevron-back" slot="start"></ion-icon>
+            < #{{ previousPokemon | number:'3.0' }}
+          </ion-button>
+          <ion-button *ngIf="nextPokemon" (click)="goToNext()" fill="outline" class="nav-button">
+            #{{ nextPokemon | number:'3.0' }} >
+            <ion-icon name="chevron-forward" slot="end"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>
