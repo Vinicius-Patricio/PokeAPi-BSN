@@ -14,7 +14,10 @@ import {
   IonCardContent,
   IonSearchbar,
   IonSelect,
-  IonSelectOption
+  IonSelectOption,
+  IonCard,
+  IonCardHeader,
+  IonCardTitle
 } from '@ionic/angular/standalone';
 import { PokemonService } from '../services/pokemon.service';
 import { PokemonBasicInfo } from '../interfaces/pokemon.interface';
@@ -43,7 +46,10 @@ import { forkJoin } from 'rxjs';
     TranslateTypePipe,
     IonSearchbar,
     IonSelect,
-    IonSelectOption
+    IonSelectOption,
+    IonCard,
+    IonCardHeader,
+    IonCardTitle
   ]
 })
 export class PokemonListPage implements OnInit {
@@ -221,5 +227,9 @@ export class PokemonListPage implements OnInit {
     if (!isNumber && !isAllowedKey) {
       event.preventDefault();
     }
+  }
+
+  getPokemonImageUrl(id: string | number): string {
+    return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
   }
 }

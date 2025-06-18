@@ -86,6 +86,14 @@ export class PokemonService {
     getPokemonDetails(id: string): Observable<PokemonDetails> {
         return this.http.get<PokemonDetails>(`${this.apiUrl}/pokemon/${id}`);
     }
+
+    getPokemonSpecies(id: string): Observable<any> {
+        return this.http.get<any>(`${this.apiUrl}/pokemon-species/${id}`);
+    }
+
+    getEvolutionChain(url: string): Observable<any> {
+        return this.http.get<any>(url);
+    }
 }
 
 export interface PokemonListResponse {

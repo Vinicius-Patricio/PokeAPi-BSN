@@ -26,8 +26,6 @@ ion-card {
     
     .id-search {
         ion-searchbar {
-            --background: #f5f5f5;
-            --border-radius: 8px;
 
             input[type="number"] {
                 -moz-appearance: textfield;
@@ -80,6 +78,50 @@ ion-card {
     max-width: 1200px;
     margin: 0 auto;
     padding: 16px;
+    margin-bottom: 18px;
+}
+
+.filters-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-end;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 120px;
+    flex: 1 1 120px;
+}
+
+.filter-group label {
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-bottom: 4px;
+    color: var(--ion-color-medium, #666);
+}
+
+.name-search,
+.id-search {
+    --background: #222;
+    --box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    --color: #222;
+    --placeholder-color: #aaa;
+    --border-radius: 8px;
+    --height: 36px;
+    font-size: 1rem;
+}
+
+@media (max-width: 600px) {
+    .filters-grid {
+        flex-direction: column;
+        gap: 8px;
+    }
+    .filter-group {
+        min-width: 0;
+        width: 100%;
+    }
 }
 
 .search-fields {
@@ -98,6 +140,8 @@ ion-card {
 }
 
 .filters-row {
+    width: 100%;
+    max-width: 1200px;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -127,11 +171,13 @@ ion-card {
 }
 
 ion-searchbar {
-    --background: #f5f5f5;
     --border-radius: 8px;
-    --box-shadow: none;
     --placeholder-color: #666;
     --placeholder-opacity: 0.8;
+    padding: 0;
+    --background: var(--ion-color-light);
+    margin-bottom: 12px;
+    max-width: 300px;
 }
 
 @media (max-width: 767px) {
@@ -141,18 +187,12 @@ ion-searchbar {
     }
     
     .id-search {
-    ion-input {
-        font-size: 14px;
-    }
+        ion-input {
+            font-size: 14px;
+        }
     }
 }
 
-ion-searchbar {
-    padding: 0;
-    --background: var(--ion-color-light);
-    --border-radius: 8px;
-    margin-bottom: 12px;
-}
 
 ion-item {
     --inner-padding-end: 0;
@@ -161,7 +201,7 @@ ion-item {
 }
 
 ion-select {
-    width: 100%;
+    max-width: 500px;
 }
 
 .pokemon-type-badge {

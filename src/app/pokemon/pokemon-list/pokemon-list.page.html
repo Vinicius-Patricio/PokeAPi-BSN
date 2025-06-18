@@ -1,76 +1,77 @@
 <ion-content>
-  <div class="header-image">
-    <img src="assets/images/logo-pokemon.png" alt="Pokémon Logo" class="logo">
-  </div>
-  
-  <div class="filters-container">
-    <div class="search-fields">
-      <ion-searchbar
-        [(ngModel)]="searchTerm"
-        (ionInput)="applyFilters()"
-        placeholder="Nome..."
-        class="name-search">
-      </ion-searchbar>
-  
-      <ion-searchbar
-        [(ngModel)]="searchId"
-        (ionInput)="handleNumberInput($event)"
-        (keypress)="onNumberKeyPress($event)"
-        type="number"
-        inputmode="numeric"
-        placeholder="Número..."
-        pattern="[0-9]*"
-        class="id-search">
-      </ion-searchbar>
-    </div>
-
-    <div class="filters-row">
-      <ion-item class="type-filter">
-        <ion-select
-          [(ngModel)]="selectedType"
-          (ionChange)="applyFilters()"
-          placeholder="Tipo"
-          interface="popover">
-          <ion-select-option value="">Todos</ion-select-option>
-          <ion-select-option *ngFor="let type of availableTypes" [value]="type">
-            {{ type | translateType }}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
-
-      <ion-item class="generation-filter">
-        <ion-select
-          [(ngModel)]="selectedGeneration"
-          (ionChange)="applyFilters()"
-          placeholder="Geração"
-          interface="popover">
-          <ion-select-option *ngFor="let generation of availableGenerations" [value]="generation.value">
-            {{ generation.label }}
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
-    </div>
-  </div>
-
-  <div class="results-info" *ngIf="(searchTerm || searchId || selectedType || selectedGeneration) && filteredPokemons.length > 0">
-    <p>Encontrados {{ totalPokemons }} Pokémon(s)</p>
-  </div>
-
-  <div class="no-results" *ngIf="!loading && filteredPokemons.length === 0 && (searchTerm || searchId || selectedType || selectedGeneration)">
-    <p>Nenhum Pokémon encontrado com os filtros aplicados.</p>
-  </div>
-
   <div class="main-container">
-    <div class="pokemon-grid ">
+    <div class="header-image">
+      <img src="assets/images/logo-pokemon.png" alt="Pokémon Logo" class="logo">
+    </div>
+    <div class="filters-container">
+      <div class="filters-grid">
+        <div class="filter-group">
+          <label for="search-nome">Nome:</label>
+          <ion-searchbar
+            id="search-nome"
+            [(ngModel)]="searchTerm"
+            (ionInput)="applyFilters()"
+            placeholder="Nome..."
+            class="name-search compact-search">
+          </ion-searchbar>
+        </div>
+        <div class="filter-group">
+          <label for="search-numero">Número:</label>
+          <ion-searchbar
+            id="search-numero"
+            [(ngModel)]="searchId"
+            (ionInput)="handleNumberInput($event)"
+            (keypress)="onNumberKeyPress($event)"
+            type="number"
+            inputmode="numeric"
+            placeholder="Número..."
+            pattern="[0-9]*"
+            class="id-search compact-search">
+          </ion-searchbar>
+        </div>
+        <div class="filter-group">
+          <label for="select-tipo">Tipo:</label>
+          <ion-item class="type-filter">
+            <ion-select
+              id="select-tipo"
+              [(ngModel)]="selectedType"
+              (ionChange)="applyFilters()"
+              placeholder="Tipo"
+              interface="popover">
+              <ion-select-option value="">Todos</ion-select-option>
+              <ion-select-option *ngFor="let type of availableTypes" [value]="type">
+                {{ type | translateType }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+        </div>
+        <div class="filter-group">
+          <label for="select-geracao">Região/Geração:</label>
+          <ion-item class="generation-filter">
+            <ion-select
+              id="select-geracao"
+              [(ngModel)]="selectedGeneration"
+              (ionChange)="applyFilters()"
+              placeholder="Geração"
+              interface="popover">
+              <ion-select-option *ngFor="let generation of availableGenerations" [value]="generation.value">
+                {{ generation.label }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+        </div>
+      </div>
+    </div>
+    <div class="pokemon-grid">
       <ion-card *ngFor="let pokemon of pokemons" [routerLink]="['/pokemon', pokemon.id]">
         <ion-card-content>
           <div class="pokemon-item">
             <img class="pokemon-image"
-                [src]="'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/' + extractId(pokemon.url) + '.png'"
+                [src]="getPokemonImageUrl(pokemon.id)"
                 alt="{{ pokemon.name }}"
                 (error)="handleImageError($event)" />
             <div class="pokemon-info">
-              <span class="pokemon-number">#{{ extractId(pokemon.url) | number:'3.0' }}</span>
+              <span class="pokemon-number">#{{ pokemon.id | number:'3.0' }}</span>
               <h2 class="pokemon-name">{{ pokemon.name | uppercase }}</h2>
               <div class="flex gap-1 mt-1 justify-center">
                 <span *ngFor="let type of pokemon.types"
@@ -95,7 +96,7 @@
                         'bg-gray-800 text-white': type === 'dark',
                         'bg-rose-400 text-white': type === 'fighting'
                       }">
-                      {{type | translateType }}
+                  {{type | translateType }}
                 </span>
               </div>
             </div>
