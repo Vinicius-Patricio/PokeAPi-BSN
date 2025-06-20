@@ -352,3 +352,18 @@
         font-size: 1.5rem;
     }
 }
+
+ion-button.favorite-btn {
+    --color: #FFD600 !important;
+    font-size: 20px !important;
+}
+
+ion-button.favorite-btn[aria-pressed="true"] ion-icon {
+    color: #FFD600 !important;
+    font-size: 20px !important;
+}
+
+ion-button.favorite-btn[aria-pressed="false"] ion-icon {
+    color: #bbb !important;
+    font-size: 20px !important;
+}

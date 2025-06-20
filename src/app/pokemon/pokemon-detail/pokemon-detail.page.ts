@@ -23,6 +23,7 @@ import {
 } from '@ionic/angular/standalone';
 import { PokemonService } from '../services/pokemon.service';
 import { TranslateTypePipe } from '../pipes/translate-type.pipe';
+import { FavoritesService } from '../services/favorites.service';
 
 @Component({
   selector: 'app-pokemon-detail',
@@ -58,6 +59,7 @@ export class PokemonDetailPage implements OnInit {
   private pokemonService = inject(PokemonService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private favoritesService = inject(FavoritesService);
 
   pokemon: any = null;
   loading = true;
@@ -236,4 +238,13 @@ export class PokemonDetailPage implements OnInit {
       this.goToPokemon(this.nextPokemon);
     }
   }
+
+  toggleFavorite(id: number): void {
+    this.favoritesService.toggleFavorite(id);
+  }
+
+  isFavorite(id: number): boolean {
+    return this.favoritesService.isFavorite(id);
+  }
+  
 }

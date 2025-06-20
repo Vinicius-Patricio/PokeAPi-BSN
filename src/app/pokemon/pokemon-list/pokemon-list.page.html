@@ -5,38 +5,26 @@
     </div>
     <div class="filters-container">
       <div class="filters-grid">
-        <div class="filter-group">
+
+        <div class="filter-group-1">
           <label for="search-nome">Nome:</label>
-          <ion-searchbar
-            id="search-nome"
-            [(ngModel)]="searchTerm"
-            (ionInput)="applyFilters()"
-            placeholder="Nome..."
+          <ion-searchbar id="search-nome" [(ngModel)]="searchTerm" (ionInput)="applyFilters()" placeholder="Nome..."
             class="name-search compact-search">
           </ion-searchbar>
         </div>
-        <div class="filter-group">
+
+        <div class="filter-group-1">
           <label for="search-numero">Número:</label>
-          <ion-searchbar
-            id="search-numero"
-            [(ngModel)]="searchId"
-            (ionInput)="handleNumberInput($event)"
-            (keypress)="onNumberKeyPress($event)"
-            type="number"
-            inputmode="numeric"
-            placeholder="Número..."
-            pattern="[0-9]*"
-            class="id-search compact-search">
+          <ion-searchbar id="search-numero" [(ngModel)]="searchId" (ionInput)="handleNumberInput($event)"
+            (keypress)="onNumberKeyPress($event)" type="number" inputmode="numeric" placeholder="Número..."
+            pattern="[0-9]*" class="id-search compact-search">
           </ion-searchbar>
         </div>
+
         <div class="filter-group">
           <label for="select-tipo">Tipo:</label>
           <ion-item class="type-filter">
-            <ion-select
-              id="select-tipo"
-              [(ngModel)]="selectedType"
-              (ionChange)="applyFilters()"
-              placeholder="Tipo"
+            <ion-select id="select-tipo" [(ngModel)]="selectedType" (ionChange)="applyFilters()" placeholder="Tipo"
               interface="popover">
               <ion-select-option value="">Todos</ion-select-option>
               <ion-select-option *ngFor="let type of availableTypes" [value]="type">
@@ -45,38 +33,44 @@
             </ion-select>
           </ion-item>
         </div>
+
         <div class="filter-group">
           <label for="select-geracao">Região/Geração:</label>
           <ion-item class="generation-filter">
-            <ion-select
-              id="select-geracao"
-              [(ngModel)]="selectedGeneration"
-              (ionChange)="applyFilters()"
-              placeholder="Geração"
-              interface="popover">
+            <ion-select id="select-geracao" [(ngModel)]="selectedGeneration" (ionChange)="applyFilters()"
+              placeholder="Geração" interface="popover">
               <ion-select-option *ngFor="let generation of availableGenerations" [value]="generation.value">
                 {{ generation.label }}
               </ion-select-option>
             </ion-select>
           </ion-item>
         </div>
+
+        <div class="filter-group">
+          <ion-item lines="none">
+            <ion-checkbox
+            slot="start"
+            [checked]="showFavoritesOnly"
+            (ionChange)="onFavoritesCheckboxChange($event)">
+            </ion-checkbox>
+            <ion-label>Mostrar só favoritos</ion-label>
+          </ion-item>
+        </div>
+
       </div>
     </div>
     <div class="pokemon-grid">
       <ion-card *ngFor="let pokemon of pokemons" [routerLink]="['/pokemon', pokemon.id]">
         <ion-card-content>
           <div class="pokemon-item">
-            <img class="pokemon-image"
-                [src]="getPokemonImageUrl(pokemon.id)"
-                alt="{{ pokemon.name }}"
-                (error)="handleImageError($event)" />
+            <img class="pokemon-image" [src]="getPokemonImageUrl(pokemon.id)" alt="{{ pokemon.name }}"
+              (error)="handleImageError($event)" />
             <div class="pokemon-info">
               <span class="pokemon-number">#{{ pokemon.id | number:'3.0' }}</span>
               <h2 class="pokemon-name">{{ pokemon.name | uppercase }}</h2>
               <div class="flex gap-1 mt-1 justify-center">
                 <span *ngFor="let type of pokemon.types"
-                      class="px-2 py-1 rounded-full text-xs capitalize pokemon-type-badge"
-                      [ngClass]="{
+                  class="px-2 py-1 rounded-full text-xs capitalize pokemon-type-badge" [ngClass]="{
                         'bg-red-500 text-white': type === 'fire',
                         'bg-blue-500 text-white': type === 'water',
                         'bg-blue-300 text-white': type === 'ice',
@@ -100,6 +94,9 @@
                 </span>
               </div>
             </div>
+            <ion-button class="favorite-btn" fill="clear" size="small" (click)="toggleFavorite(+pokemon.id); $event.stopPropagation()">
+              <ion-icon  [name]="isFavorite(+pokemon.id) ? 'star' : 'star-outline'"></ion-icon>
+            </ion-button>
           </div>
         </ion-card-content>
       </ion-card>
@@ -107,21 +104,21 @@
   </div>
   <ion-toolbar>
     <div class="flex ml-8 items-center gap-2 w-full">
-      <ion-button size="small" (click)="goToFirstPage()" [disabled]="currentPage === 1" >
+      <ion-button size="small" (click)="goToFirstPage()" [disabled]="currentPage === 1">
         Primeira
       </ion-button>
       <ion-button size="small" (click)="changePage('prev')" [disabled]="currentPage === 1">
         &lt;
       </ion-button>
-      
+
       <span class="text-sm">
         Pág. {{ currentPage }}/{{ totalPages }}
       </span>
-      
+
       <ion-button size="small" (click)="changePage('next')" [disabled]="currentPage === totalPages">
         &gt;
       </ion-button>
-      <ion-button size="small" (click)="goToLastPage()" [disabled]="currentPage === totalPages" >
+      <ion-button size="small" (click)="goToLastPage()" [disabled]="currentPage === totalPages">
         Última
       </ion-button>
     </div>

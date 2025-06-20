@@ -17,12 +17,15 @@ import {
   IonSelectOption,
   IonCard,
   IonCardHeader,
-  IonCardTitle
+  IonCardTitle,
+  IonCheckbox
 } from '@ionic/angular/standalone';
 import { PokemonService } from '../services/pokemon.service';
 import { PokemonBasicInfo } from '../interfaces/pokemon.interface';
 import { TranslateTypePipe } from '../pipes/translate-type.pipe';
 import { forkJoin } from 'rxjs';
+import { FavoritesService } from '../services/favorites.service';
+import { IonIcon } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-pokemon-list',
@@ -49,7 +52,9 @@ import { forkJoin } from 'rxjs';
     IonSelectOption,
     IonCard,
     IonCardHeader,
-    IonCardTitle
+    IonCardTitle,
+    IonIcon,
+    IonCheckbox
   ]
 })
 export class PokemonListPage implements OnInit {
@@ -87,10 +92,12 @@ export class PokemonListPage implements OnInit {
   allPokemons: PokemonBasicInfo[] = [];
   searchId = '';
   totalLoadedPokemons = 0;
+  showFavoritesOnly = false;
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private favoritesService: FavoritesService
   ) {}
 
   ngOnInit(): void {
@@ -134,8 +141,13 @@ export class PokemonListPage implements OnInit {
   applyFilters() {
     if (!this.allPokemons) return;
 
+
     this.filteredPokemons = this.allPokemons.filter(pokemon => {
       const id = pokemon.id.toString();
+      
+      if (this.showFavoritesOnly && !this.isFavorite(+pokemon.id)) {
+        return false;
+      }
       
       return (
         (!this.searchTerm || pokemon.name.toLowerCase().includes(this.searchTerm.toLowerCase())) &&
@@ -216,6 +228,20 @@ export class PokemonListPage implements OnInit {
       this.searchId = cleanValue;
       input.dispatchEvent(new Event('input'));
     }
+    this.applyFilters();
+  }
+
+  isFavorite(id: number): boolean {
+    return this.favoritesService.isFavorite(id);
+  }
+  
+  toggleFavorite(id: number) {
+    this.favoritesService.toggleFavorite(id);
+    this.applyFilters();
+  }
+
+  onFavoritesCheckboxChange(event: any) {
+    this.showFavoritesOnly = event.detail.checked;
     this.applyFilters();
   }
 
