@@ -102,11 +102,26 @@ ion-card {
     color: var(--ion-color-medium, #666);
 }
 
+.filter-group-1 {
+    display: flex;
+    flex-direction: column;
+    min-width: 120px;
+    flex: 1 1 120px;
+    margin-bottom: -9px;
+}
+
+.filter-group-1 label {
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-bottom: 4px;
+    color: var(--ion-color-medium, #666);
+}
+
 .name-search,
 .id-search {
     --background: #222;
     --box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-    --color: #222;
+    --color: #ffffff;
     --placeholder-color: #aaa;
     --border-radius: 8px;
     --height: 36px;
@@ -274,4 +289,19 @@ ion-select {
         font-size: 2rem;
         font-weight: bold;
     }
+}
+
+ion-button.favorite-btn {
+    --color: #FFD600 !important;
+    font-size: 18px !important;
+}
+
+ion-button.favorite-btn[aria-pressed="true"] ion-icon {
+    color: #FFD600 !important;
+    font-size: 18px !important;
+}
+
+ion-button.favorite-btn[aria-pressed="false"] ion-icon {
+    color: #bbb !important;
+    font-size: 18px !important;
 }

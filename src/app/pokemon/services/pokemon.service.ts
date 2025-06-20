@@ -36,8 +36,6 @@ export class PokemonService {
                 switchMap(response => {
 
                     const totalPokemons = response.count;
-                    console.log(`Total de Pokémon disponíveis na API: ${totalPokemons}`);
-                    
 
                     return this.http.get<PokemonListResponse>(
                         `${this.apiUrl}/pokemon?limit=${totalPokemons}&offset=0`
