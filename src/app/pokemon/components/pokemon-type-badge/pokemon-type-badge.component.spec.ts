@@ -1,24 +1,16 @@
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { IonicModule } from '@ionic/angular';
-
+import { TestBed } from '@angular/core/testing';
 import { PokemonTypeBadgeComponent } from './pokemon-type-badge.component';
 
 describe('PokemonTypeBadgeComponent', () => {
-  let component: PokemonTypeBadgeComponent;
-  let fixture: ComponentFixture<PokemonTypeBadgeComponent>;
-
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      declarations: [ PokemonTypeBadgeComponent, ],
-      imports: [IonicModule.forRoot()]
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [PokemonTypeBadgeComponent]
     }).compileComponents();
+  });
 
-    fixture = TestBed.createComponent(PokemonTypeBadgeComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  }));
-
-  it('should create', () => {
+  it('deve tester o tipo do pokemon', () => {
+    const fixture = TestBed.createComponent(PokemonTypeBadgeComponent);
+    const component = fixture.componentInstance;
     expect(component).toBeTruthy();
   });
 });
